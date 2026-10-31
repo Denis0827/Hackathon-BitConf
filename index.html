@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+</head>
+<body>
+<title>Semilla</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Figtree:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: una columna de trabajo; arriba 7 tallos que crecen y marcan en qué paso del flujo estás */
+:root{
+  --bg:#F1F4EC; --surface:#FBFCF8; --ink:#173222; --muted:#56685B; --line:#D7DFD0;
+  --accent:#5B9E3A; --accent-ink:#22451A; --accent-soft:#E2EFD6;
+  --emp:#2F5D8A; --emp-soft:#E1EAF3; --est:#2E7D4F; --est-soft:#DCEFE2; --ia:#56685B; --ia-soft:#E8ECE4;
+  --ok:#2E7D4F; --warn:#8A5A12; --bad:#A3302D;
+  --display:"Fraunces",Georgia,ui-sans-serif,system-ui,sans-serif;
+  --body:"Figtree",ui-sans-serif,system-ui,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0F1A13; --surface:#16241B; --ink:#E6EEE3; --muted:#9DB0A2; --line:#2A3C30;
+  --accent:#8CCB62; --accent-ink:#DDF0CC; --accent-soft:#25391E;
+  --emp:#8DB4DC; --emp-soft:#1E2E3E; --est:#7FD1A0; --est-soft:#173326; --ia:#B3C2B6; --ia-soft:#223028;
+  --ok:#7FD1A0; --warn:#E6BC6A; --bad:#F09592; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F1A13; --surface:#16241B; --ink:#E6EEE3; --muted:#9DB0A2; --line:#2A3C30;
+  --accent:#8CCB62; --accent-ink:#DDF0CC; --accent-soft:#25391E;
+  --emp:#8DB4DC; --emp-soft:#1E2E3E; --est:#7FD1A0; --est-soft:#173326; --ia:#B3C2B6; --ia-soft:#223028;
+  --ok:#7FD1A0; --warn:#E6BC6A; --bad:#F09592; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6}
+.wrap{max-width:760px;margin:0 auto;padding-block:28px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:22px}
+header{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
+.brand{font-family:var(--display);font-weight:800;font-size:32px;letter-spacing:-.01em;line-height:1.1}
+.brand .logo{display:inline-flex;align-items:center;gap:10px}
+.brand svg{width:30px;height:30px;color:var(--accent)}
+.brand small{display:block;font-family:var(--body);font-weight:400;font-size:14px;color:var(--muted);letter-spacing:0;margin-top:4px}
+.mode{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:6px}
+.mode i{width:8px;height:8px;border-radius:50%;background:var(--muted);display:inline-block}
+.mode.live i{background:var(--ok)}
+.stairs{display:grid;grid-template-columns:repeat(7,1fr);gap:14px;align-items:end;height:74px}
+.stair{border-radius:999px 999px 2px 2px;background:var(--line);position:relative;transition:background .3s}
+.stair span{position:absolute;left:0;right:0;top:-20px;text-align:center;font-family:var(--mono);font-size:11px;color:var(--muted)}
+.stair.done{background:var(--accent-soft)}
+.stair.now{background:var(--accent)}
+.stair.now span{color:var(--ink)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:24px;display:flex;flex-direction:column;gap:16px;min-width:0}
+.role{align-self:flex-start;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border-radius:999px}
+.role.emp{background:var(--emp-soft);color:var(--emp)} .role.est{background:var(--est-soft);color:var(--est)} .role.ia{background:var(--ia-soft);color:var(--ia)}
+h2{font-family:var(--display);font-weight:700;font-size:24px;line-height:1.2;margin:0;text-wrap:balance}
+h3{font-family:var(--display);font-weight:500;font-size:17px;margin:0}
+p{margin:0;max-width:65ch}
+.lead{color:var(--muted)}
+label{font-weight:600;font-size:14px}
+textarea{width:100%;min-height:120px;font:inherit;font-size:15px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px;resize:vertical}
+textarea:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+button{font:inherit;font-weight:600;font-size:15px;border-radius:10px;padding:11px 18px;cursor:pointer;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+button.primary{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+button:disabled{opacity:.5;cursor:wait}
+.ghost{background:transparent;border:none;color:var(--muted);text-decoration:underline;padding:11px 4px}
+.reto{border-left:3px solid var(--accent);padding-left:16px;display:flex;flex-direction:column;gap:10px;border-radius:0}
+.kv{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.rubric{display:grid;gap:8px}
+.rub{display:grid;grid-template-columns:1fr auto;gap:4px 12px;padding:10px 12px;background:var(--bg);border-radius:8px}
+.rub b{font-weight:600}.rub em{font-style:normal;font-family:var(--mono);font-size:13px;color:var(--accent-ink);background:var(--accent-soft);padding:1px 8px;border-radius:6px;align-self:start}
+.rub small{grid-column:1/-1;color:var(--muted);font-size:14px}
+.timer{font-family:var(--mono);font-size:14px;color:var(--warn);background:var(--accent-soft);padding:4px 10px;border-radius:8px}
+.q{display:flex;flex-direction:column;gap:6px}
+.q textarea{min-height:80px}
+.err{color:var(--bad);font-size:14px;min-height:0}
+.loading{color:var(--muted);font-size:15px;display:flex;align-items:center;gap:10px}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--accent);animation:p 1s ease-in-out infinite}
+@keyframes p{50%{opacity:.25}}
+@media (prefers-reduced-motion:reduce){.dot{animation:none}}
+.tablewrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:15px;font-variant-numeric:tabular-nums}
+th{text-align:left;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600;padding:8px;border-bottom:1px solid var(--line)}
+td{padding:10px 8px;border-bottom:1px solid var(--line)}
+tr.you td{background:var(--est-soft)}
+tr.out td{color:var(--muted)}
+.score{font-family:var(--mono);font-weight:500}
+.pill{font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px;white-space:nowrap}
+.pill.alta{background:var(--est-soft);color:var(--ok)} .pill.media{background:var(--accent-soft);color:var(--warn)} .pill.baja{background:var(--ia-soft);color:var(--bad)}
+.bars{display:grid;gap:10px}
+.bar{display:grid;grid-template-columns:minmax(0,1fr) 44px;gap:4px 10px;font-size:14px}
+.bar .track{grid-column:1/-1;height:6px;background:var(--line);border-radius:3px;overflow:hidden}
+.bar .fill{height:100%;background:var(--accent)}
+.bar small{grid-column:1/-1;color:var(--muted)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:560px){.two{grid-template-columns:1fr}}
+ul{margin:0;padding-left:20px}
+.total{display:flex;justify-content:space-between;align-items:baseline;padding:14px 16px;background:var(--emp-soft);color:var(--emp);border-radius:10px;font-weight:600}
+.total .big{font-family:var(--display);font-size:24px}
+.note{font-size:13px;color:var(--muted)}
+.cert{border:1px solid var(--accent);border-radius:14px;padding:22px;display:flex;flex-direction:column;gap:8px;background:var(--accent-soft);color:var(--accent-ink)}
+.cert .t{font-family:var(--display);font-size:22px;font-weight:700}
+.cert code{font-family:var(--mono);font-size:13px}
+input[type=checkbox]{width:18px;height:18px;accent-color:var(--emp)}
+.sides{display:flex;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:4px;align-self:flex-start}
+.sides button{border:none;padding:8px 14px}
+.sides button.on{background:var(--ink);color:var(--surface)}
+.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media (max-width:640px){.plans{grid-template-columns:1fr}}
+.plan,.item{text-align:left;display:flex;flex-direction:column;gap:6px;font-weight:400;padding:14px;border-radius:12px}
+.plan.on{border:2px solid var(--emp);background:var(--emp-soft)}
+.plan b,.item b{font-family:var(--display);font-size:17px}
+.plan .pr{font-family:var(--mono);font-size:14px;color:var(--emp)}
+.plan ul{list-style:none;padding:0;font-size:13px;color:var(--muted)}
+.tag{align-self:flex-start;font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent-ink)}
+.list{display:grid;gap:10px}
+.item.dest{border:2px solid var(--accent)}
+[contenteditable=true]{outline:1px dashed var(--accent);outline-offset:3px}
+#mode{display:none}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="brand"><span class="logo"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 30V15" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" fill="none"/><path d="M16 16C16 9 11 5 4 5c0 7 5 11 12 11Z" fill="currentColor"/><path d="M16 13c0-6 4-10 11-10 0 6-4 10-11 10Z" fill="currentColor" opacity=".6"/></svg>Semilla</span></div>
+    <div class="mode" id="mode"><i></i><span>Conectando IA…</span></div>
+  </header>
+  <div class="sides"><button id="sEmp" class="on">Soy empresa</button><button id="sEst">Soy estudiante</button></div>
+  <div class="stairs" id="stairs" aria-label="Progreso del flujo"></div>
+  <main id="screen"></main>
+</div>
+
+<script>
+const S = {step:1, side:"emp", plan:0, job:"", reto:null, answer:"", questions:[], defense:[], evalr:null, picked:new Set()};
+const PLANS = [
+ {n:"Inicial",p:50,top:5,cupo:3,res:"Para empezar: 1 reto por trimestre y 3 preseleccionados.",y:["Reto generado por IA","Defensa y coherencia","Informe estándar"],x:["Top 10 y comparación","Editar reto","Soporte dedicado"]},
+ {n:"Crecimiento",p:150,top:10,cupo:10,res:"Para contratar seguido: 3 retos por trimestre y 10 preseleccionados.",y:["Todo lo del Inicial","Top 10 y comparación","Editar reto y rúbrica","1 reto destacado"],x:["Ranking completo y métricas","Soporte dedicado"]},
+ {n:"Programa Trainee",p:300,top:99,cupo:Infinity,res:"Sin límites: retos y preseleccionados ilimitados.",y:["Todo lo de Crecimiento","Ranking completo","Métricas de todas las búsquedas","Retos destacados con tu marca","Aviso a estudiantes afines","Soporte dedicado"],x:[]}];
+let sample = null;
+const $ = s => document.querySelector(s);
+const esc = t => String(t ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fmt = n => n.toLocaleString("es-AR");
+const today = () => { const d=new Date(); return String(d.getDate()).padStart(2,"0")+"/"+String(d.getMonth()+1).padStart(2,"0")+"/"+d.getFullYear(); };
+
+const DEFAULT_JOB = "Buscamos Analista Jr. de Growth para Billetera Nube, una billetera virtual con 400.000 usuarios en Argentina. La persona va a analizar por qué los usuarios nuevos dejan de usar la app en el primer mes y proponer acciones para retenerlos. Requisitos: estudiante avanzado de carreras de negocios, manejo de Excel y pensamiento analítico.";
+
+const DEMO = {
+  reto:{titulo:"El primer mes de Billetera Nube",
+    contexto:"De cada 100 personas que se registran, 38 siguen usando la app a los 30 días. El 60% de las que abandonan nunca cargó dinero en su cuenta.",
+    consigna:"Explicá qué creés que está pasando y proponé 2 acciones priorizadas para subir la retención a 30 días. Indicá cómo medirías si funcionaron.",
+    entregable:"Texto de hasta 300 palabras.", tiempo_min:45,
+    rubrica:[{criterio:"Diagnóstico del problema",que_mira:"Identifica la causa probable y no solo el síntoma",peso:30},
+      {criterio:"Uso de los datos",que_mira:"Se apoya en los números del caso para argumentar",peso:25},
+      {criterio:"Priorización",que_mira:"Justifica por qué una acción va antes que la otra",peso:25},
+      {criterio:"Medición",que_mira:"Propone una métrica concreta y un plazo",peso:20}]},
+  answer:"El dato clave es que 6 de cada 10 que se van nunca cargaron plata: el problema no es que la app no guste, es que nunca llegaron a usarla de verdad. Creo que el registro termina y el usuario no sabe para qué le sirve cargar dinero.\n\nAcción 1 (primero): un incentivo a la primera carga, por ejemplo un reintegro del 10% en la primera compra con QR, mostrado apenas termina el registro. Va primero porque ataca directo al 60%.\n\nAcción 2: una secuencia de 3 notificaciones en la primera semana con casos de uso concretos (pagar el colectivo, dividir gastos con amigos).\n\nMediría el porcentaje de usuarios nuevos que cargan dinero en los primeros 7 días y la retención a 30 días, comparando un grupo con la acción contra uno sin ella durante un mes.",
+  questions:["¿Por qué elegiste un reintegro y no, por ejemplo, simplificar el proceso de carga?","Si el reintegro sube las cargas pero la retención a 30 días no se mueve, ¿qué concluirías?","Si el presupuesto para incentivos fuera la mitad, ¿qué cambiarías de tu plan?"],
+  defense:["Porque el dato dice que no cargan, pero no sé si es por fricción o por falta de motivo. El reintegro me deja testear la motivación rápido; si no funciona, el próximo paso sería revisar la fricción del proceso.","Que el problema no era solo la primera carga sino el uso recurrente, y pasaría a priorizar la acción 2 o buscar un segundo momento de abandono.","Achicaría el reintegro a un grupo de prueba más chico y le daría más peso a las notificaciones, que son casi gratis."],
+  evalr:{puntajes:[{criterio:"Diagnóstico del problema",nota:8,comentario:"Separa síntoma de causa usando el 60%."},{criterio:"Uso de los datos",nota:8,comentario:"Usa bien el dato principal; podría usar también el 38%."},{criterio:"Priorización",nota:7,comentario:"Justifica el orden, aunque sin estimar impacto."},{criterio:"Medición",nota:8,comentario:"Métrica clara y grupo de control."}],
+    coherencia:"alta", nota_coherencia:"La defensa sostiene y amplía la entrega: reconoce la duda entre fricción y motivación, algo que no estaba escrito.",
+    fortalezas:["Va a la causa con los datos del caso","Piensa en experimentos y no en certezas"],
+    a_mejorar:["Estimar el impacto esperado de cada acción","Considerar el costo del incentivo"],
+    resumen_empresa:"Perfil analítico que razona con datos y defiende sus decisiones con criterio propio. Recomendado para entrevista.",
+    devolucion_estudiante:"Tu diagnóstico fue lo más fuerte: viste que el problema era la primera carga y no la app en sí. Para la próxima, sumá una estimación de impacto y de costo a cada acción: es lo que más valoran en roles de growth."}
+};
+const OTHERS = [{n:"Lucía M.",s:84,c:"alta"},{n:"Tomás R.",s:80,c:"alta"},{n:"Valentina S.",s:73,c:"media"},{n:"Julián P.",s:68,c:"alta"},{n:"Camila D.",s:61,c:"media"},{n:"Bruno A.",s:54,c:"baja"},{n:"Martina G.",s:49,c:"baja"},{n:"Facundo L.",s:45,c:"media"},{n:"Sol B.",s:41,c:"baja"},{n:"Nicolás V.",s:37,c:"baja"}];
+const RETOS = [
+ {e:"Billetera Nube",r:"Analista Jr. de Growth",d:1,job:DEFAULT_JOB},
+ {e:"Logística Austral",r:"Analista Jr. de Operaciones",d:1,job:"Buscamos Analista Jr. de Operaciones para Logística Austral, empresa de distribución con 12 centros en Argentina. Va a analizar demoras en las entregas y proponer mejoras de procesos. Requisitos: estudiante avanzado de negocios o ingeniería, manejo de Excel."},
+ {e:"Café del Sur",r:"Asistente de Marketing",d:0,job:"Buscamos Asistente de Marketing para Café del Sur, cadena de 8 cafeterías en Buenos Aires. Va a analizar por qué bajaron las ventas de la tarde y proponer campañas para recuperarlas. Requisitos: estudiante de marketing o negocios."}];
+async function genReto(v){
+  S.job=v; loading("La IA está diseñando un reto a partir del puesto…");
+  S.reto = await ask(`Sos el motor de Semilla, que convierte búsquedas laborales junior en retos prácticos para estudiantes universitarios argentinos. Escribí en español rioplatense.
+Descripción del puesto:\n"""${v}"""
+Diseñá un reto realista que un estudiante resuelva en 45 minutos, con un contexto que incluya 2 o 3 datos numéricos concretos e inventados pero verosímiles. Formato:
+{"titulo":"...","contexto":"...","consigna":"...","entregable":"Texto de hasta 300 palabras.","tiempo_min":45,"rubrica":[{"criterio":"...","que_mira":"...","peso":30}]}
+La rúbrica tiene exactamente 4 criterios que midan pensamiento crítico, y los pesos suman 100.`, DEMO.reto);
+}
+function computeRanking(){
+  const ev=S.evalr, rub=S.reto.rubrica; let t=0;
+  ev.puntajes.forEach((p,i)=>{ t+=p.nota*((rub[i]?.peso)||25)/10; }); S.total=Math.round(t);
+  S.coh=["alta","media","baja"].includes(ev.coherencia)?ev.coherencia:"media";
+  S.ranking=[...OTHERS,{n:"Candidato de la demo",s:S.total,c:S.coh,you:true}].sort((a,b)=>b.s-a.s);
+  if(!S.picked.size) S.ranking.slice(0,3).forEach(x=>S.picked.add(x.n));
+}
+function setSide(s){
+  S.side=s; $("#sEmp").classList.toggle("on",s==="emp"); $("#sEst").classList.toggle("on",s==="est");
+  Object.assign(S,{job:"",reto:null,answer:"",questions:[],defense:[],evalr:null,picked:new Set()}); stopTimer(); go(s==="emp"?1:0);
+}
+
+const STEPS = [
+  {n:1,role:"emp",who:"Empresa"},{n:2,role:"ia",who:"IA"},{n:3,role:"est",who:"Estudiante"},
+  {n:4,role:"ia",who:"IA + Estudiante"},{n:5,role:"ia",who:"IA"},{n:6,role:"emp",who:"Empresa"},{n:7,role:"est",who:"Estudiante"}];
+
+function drawStairs(){
+  $("#stairs").innerHTML = STEPS.map(s=>`<div class="stair ${s.n<S.step?"done":s.n===S.step?"now":""}" style="height:${18+s.n*8}px"><span>${s.n}</span></div>`).join("");
+}
+
+function parseJSON(t){ const a=t.indexOf("{"), b=t.lastIndexOf("}"); if(a<0||b<0) throw new Error("sin JSON"); return JSON.parse(t.slice(a,b+1)); }
+async function ask(prompt, fallback, tier){
+  if(!sample) return fallback;
+  try{ const r = await sample(prompt + "\n\nRespondé SOLO con JSON válido, sin texto antes ni después.", {modelTier:tier||"default"}); return parseJSON(r.text); }
+  catch(e){ console.warn(e); return fallback; }
+}
+function loading(msg){ $("#screen").innerHTML = `<section class="card"><div class="loading"><span class="dot"></span>${esc(msg)}</div></section>`; }
+function go(n){ S.step=n; drawStairs(); render(); window.scrollTo({top:0,behavior:"smooth"}); }
+function head(n,title,lead){ const s=STEPS[n-1]; return `<span class="role ${s.role}">${n}. ${s.who}</span><h2>${title}</h2>${lead?`<p class="lead">${lead}</p>`:""}`; }
+function retoBlock(r,showRub){ return `<div class="reto"><div class="kv">El reto</div><h3 id="eT">${esc(r.titulo)}</h3><p id="eC">${esc(r.contexto)}</p><p><b>Consigna:</b> <span id="eG">${esc(r.consigna)}</span></p><p class="note">${esc(r.entregable)} · Tiempo: ${esc(r.tiempo_min)} minutos</p></div>`+
+  (showRub?`<div class="kv">Rúbrica de evaluación</div><div class="rubric">${r.rubrica.map(x=>`<div class="rub"><b>${esc(x.criterio)}</b><em>${esc(x.peso)}%</em><small>${esc(x.que_mira)}</small></div>`).join("")}</div>`:""); }
+
+function render(){
+  const el = $("#screen");
+  if(S.step===0){
+    el.innerHTML = `<section class="card"><span class="role est">Estudiante</span><h2>Retos disponibles</h2><p class="lead">Elegí un reto para resolver. Los destacados aparecen primero.</p>
+      <div class="list">${RETOS.map((r,i)=>`<button class="item ${r.d?"dest":""}" id="rt${i}">${r.d?'<span class="tag">Destacado</span>':""}<b>${esc(r.r)}</b><span class="note">${esc(r.e)} · 45 minutos</span></button>`).join("")}</div></section>`;
+    RETOS.forEach((r,i)=>$("#rt"+i).onclick=async()=>{ await genReto(r.job); go(3); });
+  }
+  else if(S.step===1){
+    el.innerHTML = `<section class="card">${head(1,"Cargá la búsqueda","Pegá la descripción del puesto junior tal como la publicarías. La IA la convierte en un reto real.")}
+      <label for="job">Descripción del puesto</label><textarea id="job" style="min-height:150px">${esc(S.job||DEFAULT_JOB)}</textarea>
+      <div class="err" id="e1"></div><div class="row"><button class="primary" id="b1">Generar reto</button></div></section>`;
+    $("#job").oninput=()=>$("#e1").textContent="";
+    $("#b1").onclick = async()=>{
+      const v=$("#job").value.trim(); if(v.length<40){$("#e1").textContent="Escribí una descripción más completa (al menos un par de oraciones).";return;}
+      await genReto(v); go(2);
+    };
+  }
+  else if(S.step===2){
+    el.innerHTML = `<section class="card">${head(2,"El reto está listo","La empresa no diseña nada: revisa lo que generó la IA, lo edita si quiere y lo aprueba.")}${retoBlock(S.reto,true)}
+      <div class="row"><button class="primary" id="b2">Aprobar y publicar</button><button id="r2">Generar otro</button><button id="ed2">Editar reto</button></div></section>`;
+    $("#ed2").onclick=()=>{ ["#eT","#eC","#eG"].forEach(s=>$(s).contentEditable="true"); $("#ed2").textContent="Tocá el texto para editarlo"; $("#eT").focus(); };
+    $("#b2").onclick=()=>{ S.reto.titulo=$("#eT").textContent.trim(); S.reto.contexto=$("#eC").textContent.trim(); S.reto.consigna=$("#eG").textContent.trim(); go(3); };
+    $("#r2").onclick=()=>{ go(1); $("#b1").click(); };
+  }
+  else if(S.step===3){
+    el.innerHTML = `<section class="card">${head(3,"Resolvé el reto","Así lo ve el estudiante que se postuló.")}<div class="row"><span class="timer" id="tm">45:00</span></div>${retoBlock(S.reto,false)}
+      <label for="ans">Tu respuesta</label><textarea id="ans" style="min-height:200px">${esc(S.answer)}</textarea>
+      <div class="err" id="e3"></div><div class="row"><button class="primary" id="b3">Entregar</button><button class="ghost" id="x3">Completar con una respuesta de ejemplo</button></div></section>`;
+    startTimer();
+    $("#ans").oninput=()=>$("#e3").textContent="";
+    $("#x3").onclick=async()=>{
+      $("#x3").disabled=true; $("#x3").textContent="Escribiendo…";
+      const isDemo = S.reto.titulo===DEMO.reto.titulo;
+      const r = await ask(`Escribí la respuesta de un estudiante universitario argentino bueno pero no perfecto a este reto, en primera persona, rioplatense, hasta 220 palabras.\nReto: ${JSON.stringify(S.reto)}\nFormato: {"respuesta":"..."}`, {respuesta: isDemo?DEMO.answer:"(Sin IA disponible: escribí tu respuesta acá.)"}, "quick");
+      $("#ans").value=r.respuesta; $("#x3").disabled=false; $("#x3").textContent="Completar con una respuesta de ejemplo";
+    };
+    $("#b3").onclick=async()=>{
+      const v=$("#ans").value.trim(); if(v.split(/\s+/).length<30){$("#e3").textContent="La respuesta es muy corta: desarrollá al menos un párrafo.";return;}
+      S.answer=v; stopTimer(); loading("La IA está leyendo tu respuesta para preparar la defensa…");
+      const r = await ask(`Sos un evaluador exigente. Leé el reto y la respuesta del estudiante y escribí 3 preguntas de defensa, cortas, en rioplatense, que pongan a prueba si entiende su propio razonamiento (por qué eligió algo, qué haría si cambia un supuesto, qué descartó). Deben ser específicas de esta respuesta.\nReto: ${JSON.stringify(S.reto)}\nRespuesta: """${v}"""\nFormato: {"preguntas":["...","...","..."]}`, {preguntas:DEMO.questions});
+      S.questions=r.preguntas.slice(0,3); S.defense=["","",""]; go(4);
+    };
+  }
+  else if(S.step===4){
+    el.innerHTML = `<section class="card">${head(4,"Defendé tu respuesta","Una IA puede escribir una entrega, pero acá se evalúa si podés sostenerla. Las preguntas salen de lo que escribiste.")}
+      ${S.questions.map((q,i)=>`<div class="q"><label for="d${i}">${i+1}. ${esc(q)}</label><textarea id="d${i}">${esc(S.defense[i])}</textarea></div>`).join("")}
+      <div class="err" id="e4"></div><div class="row"><button class="primary" id="b4">Enviar defensa</button><button class="ghost" id="x4">Completar con ejemplo</button></div></section>`;
+    S.questions.forEach((_,i)=>$("#d"+i).oninput=()=>$("#e4").textContent="");
+    $("#x4").onclick=async()=>{
+      $("#x4").disabled=true; $("#x4").textContent="Escribiendo…";
+      const same = S.questions[0]===DEMO.questions[0];
+      const r = await ask(`Sos el mismo estudiante que escribió esta respuesta. Contestá cada pregunta de defensa en 1 o 2 oraciones, rioplatense, coherente con tu respuesta.\nRespuesta: """${S.answer}"""\nPreguntas: ${JSON.stringify(S.questions)}\nFormato: {"respuestas":["...","...","..."]}`, {respuestas: same?DEMO.defense:["","",""]}, "quick");
+      r.respuestas.forEach((t,i)=>{ if($("#d"+i)) $("#d"+i).value=t; });
+      $("#x4").disabled=false; $("#x4").textContent="Completar con ejemplo";
+    };
+    $("#b4").onclick=async()=>{
+      const vals=S.questions.map((_,i)=>$("#d"+i).value.trim());
+      if(vals.some(v=>v.length<10)){$("#e4").textContent="Respondé las 3 preguntas, aunque sea en una oración cada una.";return;}
+      S.defense=vals; loading("La IA está evaluando la entrega y la defensa con la rúbrica…");
+      const r = await ask(`Sos el evaluador de Semilla. Evaluá al estudiante con la rúbrica, de 0 a 10 por criterio, siendo exigente y justo. Compará la entrega con la defensa: si la defensa es vaga, contradictoria o no muestra comprensión de lo escrito, la coherencia es baja (posible respuesta no propia). Escribí en rioplatense.
+Reto y rúbrica: ${JSON.stringify(S.reto)}
+Entrega: """${S.answer}"""
+Defensa: ${JSON.stringify(S.questions.map((q,i)=>({pregunta:q,respuesta:vals[i]})))}
+Formato: {"puntajes":[{"criterio":"...","nota":7,"comentario":"una oración"}],"coherencia":"alta|media|baja","nota_coherencia":"una oración","fortalezas":["...","..."],"a_mejorar":["...","..."],"resumen_empresa":"dos oraciones para la empresa","devolucion_estudiante":"tres oraciones de devolución al estudiante, en segunda persona"}`, DEMO.evalr, "complex");
+      S.evalr=r; computeRanking(); go(S.side==="est"?7:5);
+    };
+  }
+  else if(S.step===5){
+    const ev=S.evalr, rub=S.reto.rubrica, total=S.total, coh=S.coh, list=S.ranking, lim=Math.min(5,list.length);
+    const nota=(x,j)=>x.you?ev.puntajes[j]?.nota:Math.max(3,Math.min(10,Math.round(x.s/10+((j*7+x.n.length)%3-1))));
+    const t3=list.slice(0,3);
+    el.innerHTML = `<section class="card">${head(5,"Evaluación y ranking","Lo que recibe la empresa: el top 5 y un informe de cada candidato.")}
+      <div class="tablewrap"><table><thead><tr><th>#</th><th>Candidato</th><th>Puntaje</th><th>Coherencia de la defensa</th></tr></thead><tbody>
+      ${list.map((x,i)=>`<tr class="${x.you?"you":""} ${i>=lim?"out":""}"><td>${i+1}</td><td>${esc(x.n)}${x.you?" (vos)":""}</td><td class="score">${x.s}/100</td><td><span class="pill ${x.c}">${x.c}</span></td></tr>`).join("")}
+      </tbody></table></div><p class="note">Los otros candidatos son de ejemplo. Del puesto 6 en adelante no se envían a la empresa.</p></section>
+      ${true?`<section class="card"><span class="role ia">Comparación del top 3</span><div class="tablewrap"><table><thead><tr><th>Criterio</th>${t3.map(x=>`<th>${esc(x.n)}</th>`).join("")}</tr></thead><tbody>${rub.map((c,j)=>`<tr><td>${esc(c.criterio)}</td>${t3.map(x=>`<td class="score">${nota(x,j)}/10</td>`).join("")}</tr>`).join("")}<tr><td>Coherencia</td>${t3.map(x=>`<td><span class="pill ${x.c}">${x.c}</span></td>`).join("")}</tr></tbody></table></div></section>`:""}
+      <section class="card"><span class="role ia">Informe del candidato de la demo</span><h2>${total}/100</h2>
+      <div class="bars">${ev.puntajes.map(p=>`<div class="bar"><span>${esc(p.criterio)}</span><span class="score">${esc(p.nota)}/10</span><div class="track"><div class="fill" style="width:${Math.max(0,Math.min(10,p.nota))*10}%"></div></div><small>${esc(p.comentario)}</small></div>`).join("")}</div>
+      <div class="rub"><b>Coherencia entre entrega y defensa</b><span class="pill ${coh}">${coh}</span><small>${esc(ev.nota_coherencia)}</small></div>
+      <div class="two"><div><div class="kv">Fortalezas</div><ul>${ev.fortalezas.map(f=>`<li>${esc(f)}</li>`).join("")}</ul></div><div><div class="kv">A mejorar</div><ul>${ev.a_mejorar.map(f=>`<li>${esc(f)}</li>`).join("")}</ul></div></div>
+      <p><b>Resumen para la empresa:</b> ${esc(ev.resumen_empresa)}</p>
+      <div class="row"><button class="primary" id="b5">Pasar a la empresa</button></div></section>`;
+    $("#b5").onclick=()=>go(6);
+  }
+  else if(S.step===6){
+    const top=S.ranking.slice(0,5), cnt=()=>[...S.picked].filter(p=>top.some(t=>t.n===p)).length;
+    const draw=()=>{ const n=cnt(); $("#tot").innerHTML=`<span>Preseleccionados para entrevista</span><span class="big">${n}</span>`; $("#b6").disabled=n===0; };
+    el.innerHTML = `<section class="card">${head(6,"Elegí a quién entrevistar","Marcá los candidatos que querés conocer.")}
+      <div class="tablewrap"><table><thead><tr><th></th><th>Candidato</th><th>Puntaje</th><th>Coherencia</th></tr></thead><tbody>
+      ${top.map((x,i)=>`<tr class="${x.you?"you":""}"><td><input type="checkbox" id="c${i}" ${S.picked.has(x.n)?"checked":""} aria-label="Preseleccionar ${esc(x.n)}"></td><td><label for="c${i}" style="font-weight:400">${esc(x.n)}${x.you?" (vos)":""}</label></td><td class="score">${x.s}/100</td><td><span class="pill ${x.c}">${x.c}</span></td></tr>`).join("")}
+      </tbody></table></div><div class="total" id="tot"></div><div class="err" id="e6"></div>
+      <div class="row"><button class="primary" id="b6">Confirmar preselección</button></div></section>`;
+    top.forEach((x,i)=>$("#c"+i).onchange=e=>{ e.target.checked?S.picked.add(x.n):S.picked.delete(x.n); draw(); });
+    draw(); $("#b6").onclick=()=>go(7);
+  }
+  else if(S.step===7){
+    const pos=S.ranking.findIndex(x=>x.you)+1, chosen=S.picked.has("Candidato de la demo");
+    const code="SE-"+new Date().getFullYear()+"-"+Math.random().toString(36).slice(2,6).toUpperCase();
+    el.innerHTML = `<section class="card">${head(7,chosen?"¡Pasaste a entrevista!":"Gracias por participar","Todos los que participan se llevan algo, aunque no queden.")}
+      <p>Quedaste en el puesto <b>${pos}</b> de ${S.ranking.length} con <b>${S.total}/100</b>.</p>
+      <div class="rub"><b>Tu devolución</b><span></span><small style="color:var(--ink);font-size:15px">${esc(S.evalr.devolucion_estudiante)}</small></div>
+      <div class="cert"><span class="kv" style="color:inherit">Certificado verificable</span><span class="t">${esc(S.reto.titulo)}</span><span>Reto resuelto y defendido · Puntaje ${S.total}/100 · ${today()}</span><code>Código de verificación: ${code}</code></div>
+      <p class="note">↻ Cuando la empresa avisa si contrató a alguien, ese dato ajusta cómo evalúa la IA en los próximos retos.</p>
+      <div class="row"><button class="primary" id="b7">Empezar de nuevo</button></div></section>`;
+    $("#b7").onclick=()=>setSide(S.side);
+  }
+}
+let tmr=null;
+function startTimer(){ stopTimer(); let s=(S.reto.tiempo_min||45)*60; tmr=setInterval(()=>{ s=Math.max(0,s-1); const t=$("#tm"); if(t) t.textContent=String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0"); },1000); }
+function stopTimer(){ if(tmr) clearInterval(tmr); tmr=null; }
+
+$("#sEmp").onclick=()=>setSide("emp"); $("#sEst").onclick=()=>setSide("est");
+drawStairs(); render();
+(async()=>{
+  try{ sample = window.claude?.use ? await window.claude.use("sample") : null; }catch(e){ sample=null; }
+  const m=$("#mode");
+  if(sample){ m.classList.add("live"); m.querySelector("span").textContent="IA en vivo"; }
+  else { m.querySelector("span").textContent="Modo demo (respuestas de ejemplo)"; }
+})();
+</script>
+
+</body>
+</html>
